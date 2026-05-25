@@ -38,16 +38,14 @@ async def test_clean_complete_task():
 
     sheduler.tasks = [task1, task2]
 
-    asyncio.create_task(sheduler.clean_complete_tasks())
+    cleaner = asyncio.create_task(sheduler.clean_complete_tasks())
 
     await asyncio.sleep(3.1)
 
     assert len(sheduler.tasks) == 1
     assert sheduler.tasks[0] == task2
+    cleaner.cancel()
     task2.cancel()
-
-
-
 
 
 @pytest.mark.asyncio
@@ -62,7 +60,7 @@ async def test_list():
 
     with patch('asyncio.to_thread') as mock_input:
         mock_input.side_effect = ["list", "exit"]
-        main = asyncio.create_task(sheduler.main())
+        main = asyncio.create_task(sheduler.run())
         await asyncio.sleep(0.3)
         main.cancel()
     task1.__str__.assert_called()
@@ -78,7 +76,7 @@ async def test_exit():
 
     with patch('asyncio.to_thread') as mock_input:
         mock_input.side_effect = ["exit"]
-        main = asyncio.create_task(sheduler.main())
+        main = asyncio.create_task(sheduler.run())
         await asyncio.sleep(0.3)
         assert main.done()
         assert task.done()

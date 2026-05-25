@@ -7,12 +7,22 @@ from src.constants import STATUS
 
 
 class Sheduler:
+    """
+    Исполнитель задач
+    """
+
     tasks: list
 
-    def __init__(self):
+    def __init__(self) -> None:
+        """
+        Инициализация класса
+        """
         self.tasks = []
 
-    async def main(self) -> None:
+    async def run(self) -> None:
+        """
+        Основная часть исполнителя: асинхронная консоль
+        """
         clean_tasks = asyncio.create_task(self.clean_complete_tasks())
         while True:
             cin = await asyncio.to_thread(input, "> ")
@@ -46,6 +56,10 @@ class Sheduler:
                 print("Incorrect input")
 
     async def create_task(self, task: Task) -> None:
+        """
+        Запуск выполнения задачи
+        :param task: Задача, полученная из источника
+        """
         if task.status == STATUS.COMPLETED:
             return
         await asyncio.sleep(random()*5)
@@ -53,6 +67,9 @@ class Sheduler:
         print(f"Я сделать задача {task.short()}, начальника!")
 
     async def clean_complete_tasks(self):
+        """
+        Фоновый очиститель выполненных задач из массива
+        """
         while True:
             await asyncio.sleep(3)
             self.tasks = [i for i in self.tasks if not i.done()]
