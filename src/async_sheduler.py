@@ -50,7 +50,7 @@ class Sheduler:
             return
         await asyncio.sleep(random()*5)
         task.status = int(STATUS.COMPLETED)
-        print(f"Я сделать задача {task}, начальника!")
+        print(f"Я сделать задача {task.short()}, начальника!")
 
     async def clean_complete_tasks(self):
         while True:

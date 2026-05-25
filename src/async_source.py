@@ -12,5 +12,9 @@ class FileSource:
     async def __aiter__(self) -> AsyncGenerator[Task | None]:
         async with aiofiles.open(self.filename, "r", encoding="utf-8") as f:
             async for i in f:
-                if i:
-                    yield Task.create(i)
+                if i.strip():
+                    try:
+                        yield Task.create(i)
+                    except ValueError:
+                        print("Плохая задача начальника, не хочу её делать")
+                        continue

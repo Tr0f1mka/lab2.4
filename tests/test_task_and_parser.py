@@ -12,3 +12,8 @@ def test_task_str():
     str_test = str(test)
     assert str_test.startswith("Task( id: ")
     assert str_test.endswith(", name: name, body: body, status: 1, priority: 1 )")
+
+def test_task_short():
+    test = Task.create('{"name": "name", "body": "body", "status": 1, "priority": 1}')
+    str_test = test.short()
+    assert str_test.startswith("Task( name: name )")
