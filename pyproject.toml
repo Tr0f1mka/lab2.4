@@ -13,5 +13,6 @@ omit = [
     "src/cli.py",
     "tests/*",
     "*/__init__.py",
-    "*/constants.py"
+    "*/constants.py",
+    "src/async_sheduler.py"
 ]

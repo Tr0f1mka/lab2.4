@@ -1,7 +1,7 @@
 import pytest              #type: ignore
 import tempfile
 
-from src.async_source import FileSource
+from src.sources.file_source import FileSource
 
 
 @pytest.mark.asyncio
@@ -15,7 +15,7 @@ async def test_read():
         file = f.name
 
     tasks = []
-    async for i in FileSource(file):
+    async for i in FileSource(file).get_tasks():
         tasks.append(i)
     assert len(tasks) == 3
     assert tasks.count(None) == 0

@@ -1,9 +1,7 @@
 import asyncio
-from random import random
 
-from src.async_source import FileSource
-from src.task import Task
-from src.constants import STATUS
+from src.sources.file_source import FileSource
+from src.sources.generator_tasks import GeneratorSource
 
 
 class Sheduler:
@@ -35,18 +33,97 @@ class Sheduler:
                 clean_tasks.cancel()
                 break
 
-            elif cin.startswith("add_source"):
+            elif cin == "":
+                continue
+
+            elif cin.startswith("file "):
                 cmd = cin.split()
                 if len(cmd) != 2:
                     print("Incorrect input")
+                    continue
                 try:
-                    async for i in FileSource(cmd[1]):
+                    async for i in FileSource(cmd[1]).get_tasks():
                         if i:
-                            self.tasks.append(asyncio.create_task(self.create_task(i)))
+                            self.tasks.append(asyncio.create_task(i.run()))
                 except FileNotFoundError:
                     print(f"Файла {cmd[1]} не существуют")
                 except PermissionError:
                     print("У вас нет прав на этот файл")
+
+            elif cin.startswith("file_name "):
+                cmd = cin.split()
+                if len(cmd) != 3:
+                    print("Incorrect input")
+                    continue
+                try:
+                    async for i in FileSource(cmd[1]).get_tasks(name=cmd[2]):
+                        if i:
+                            self.tasks.append(asyncio.create_task(i.run()))
+                except FileNotFoundError:
+                    print(f"Файла {cmd[1]} не существуют")
+                except PermissionError:
+                    print("У вас нет прав на этот файл")
+
+            elif cin.startswith("file_status "):
+                cmd = cin.split()
+                if len(cmd) != 3:
+                    print("Incorrect input")
+                    continue
+                try:
+                    async for i in FileSource(cmd[1]).get_tasks(status=int(cmd[2])):
+                        if i:
+                            self.tasks.append(asyncio.create_task(i.run()))
+                except FileNotFoundError:
+                    print(f"Файла {cmd[1]} не существуют")
+                except PermissionError:
+                    print("У вас нет прав на этот файл")
+
+
+            elif cin.startswith("file_priority "):
+                cmd = cin.split()
+                if len(cmd) != 3:
+                    print("Incorrect input")
+                    continue
+                try:
+                    async for i in FileSource(cmd[1]).get_tasks(priority=int(cmd[2])):
+                        if i:
+                            self.tasks.append(asyncio.create_task(i.run()))
+                except FileNotFoundError:
+                    print(f"Файла {cmd[1]} не существуют")
+                except PermissionError:
+                    print("У вас нет прав на этот файл")
+
+            elif cin == "gen":
+                async for i in GeneratorSource().get_tasks():
+                    if i:
+                        self.tasks.append(asyncio.create_task(i.run()))
+
+            elif cin.startswith("gen_name "):
+                cmd = cin.split()
+                if len(cmd) != 2:
+                    print("Incorrect input")
+                    continue
+                async for i in GeneratorSource().get_tasks(name=cmd[1]):
+                    if i:
+                        self.tasks.append(asyncio.create_task(i.run()))
+
+            elif cin.startswith("gen_status "):
+                cmd = cin.split()
+                if len(cmd) != 2:
+                    print("Incorrect input")
+                    continue
+                async for i in GeneratorSource().get_tasks(status=int(cmd[1])):
+                    if i:
+                        self.tasks.append(asyncio.create_task(i.run()))
+
+            elif cin.startswith("gen_priority "):
+                cmd = cin.split()
+                if len(cmd) != 2:
+                    print("Incorrect input")
+                    continue
+                async for i in GeneratorSource().get_tasks(priority=int(cmd[1])):
+                    if i:
+                        self.tasks.append(asyncio.create_task(i.run()))
 
             elif cin == "list":
                 for i in self.tasks:
@@ -55,16 +132,6 @@ class Sheduler:
             else:
                 print("Incorrect input")
 
-    async def create_task(self, task: Task) -> None:
-        """
-        Запуск выполнения задачи
-        :param task: Задача, полученная из источника
-        """
-        if task.status == STATUS.COMPLETED:
-            return
-        await asyncio.sleep(random()*5)
-        task.status = int(STATUS.COMPLETED)
-        print(f"Я сделать задача {task.short()}, начальника!")
 
     async def clean_complete_tasks(self):
         """
