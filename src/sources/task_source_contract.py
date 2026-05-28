@@ -6,7 +6,7 @@ from src.task.task import Task
 @runtime_checkable
 class TaskSource(Protocol):
     """
-    Класс источника. Задаёт общие контракты get_tasks и create_source для всех источников
+    Класс источника. Задаёт общий контракт get_tasks для всех источников
     """
 
     async def get_tasks(self,

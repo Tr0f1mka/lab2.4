@@ -7,6 +7,7 @@ from src.settings.constants import STATUS
 from src.task.descriptors import (ImmutableStrDescriptor,
                              StatusDescriptor,
                              PriorityDescriptor)
+from src.utilities.logger import logger
 
 
 @dataclass()
@@ -20,7 +21,14 @@ class Task:
     status = StatusDescriptor()
     priority = PriorityDescriptor()
 
-    def __init__(self, id: str, name: str, body: str, status: int, priority: int):
+    def __init__(self, id: str, name: str, body: str, status: int, priority: int) -> None:
+        """
+        Инициализация
+        :param name: Строка - имя задачи
+        :param body: Строка - тело задачи
+        :param status: Число - статус задачи
+        :param priority: Число - приоритет задачи
+        """
         self.id = id
         self.name = name
         self.body = body
@@ -60,8 +68,11 @@ class Task:
         """
         Запуск выполнения задачи (заглушка)
         """
+        logger.info(f"Task {self.name} was started")
         if self.status == STATUS.COMPLETED:
+            logger.info(f"Task {self.name} completed")
             return
         await asyncio.sleep(random()*5)
         self.status = int(STATUS.COMPLETED)
         print(f"Я сделать задача {self.short()}, начальника!")
+        logger.info(f"Task {self.name} has completed")
